@@ -199,14 +199,48 @@ h1, h2, h3, h4, p { margin: 0; }
 .reader[data-kind="note"] { background: #f5e8cc; }
 .reader[data-kind="note"] .reader-inner { background: repeating-linear-gradient(to bottom, transparent 0 35px, #bca77b38 36px 37px); }
 .reader[data-kind="note"] .reader-body > p { font-family: var(--serif); font-size: 16px; white-space: pre-line; }
-.reader[data-feature="lam"] { width: min(970px, calc(100% - 30px)); }
-.reader[data-feature="lam"] .reader-inner {
+.reader:is([data-feature="lam"], [data-feature="dung"]) { width: min(970px, calc(100% - 30px)); }
+.reader[data-feature="hung"] { width: min(1000px, calc(100% - 30px)); }
+.reader[data-feature="hung"] .reader-inner {
+  display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(260px, 1fr);
+  align-items: center; gap: clamp(16px, 3vw, 36px); padding-top: 52px;
+}
+.reader[data-feature="hung"] .reader-body { grid-column: 1; grid-row: 1; min-width: 0; }
+.reader[data-feature="hung"] .close-reader { position: absolute; top: 12px; right: 14px; float: none; margin: 0; }
+.hung-photo { grid-column: 2; grid-row: 1; text-align: center; }
+.hung-picture { position: relative; }
+.reader .hung-photo img {
+  width: 100%; max-height: 49dvh; object-fit: contain;
+  border: 3px solid #fff8eb; border-radius: 10px; box-shadow: 0 10px 22px #6a3a3059;
+}
+.hung-hearts { position: absolute; inset: 0; pointer-events: none; }
+.hung-hearts span {
+  position: absolute; bottom: 3%; left: var(--left); color: #c85966; font-size: var(--size);
+  text-shadow: 0 2px 5px #60313c6b;
+  animation: hung-heart-rise var(--duration) ease-in infinite;
+  animation-delay: var(--delay);
+}
+.hung-hearts span:nth-child(1) { --left: 6%; --size: 16px; --duration: 4.2s; --delay: -1s; --drift: -18px; }
+.hung-hearts span:nth-child(2) { --left: 18%; --size: 12px; --duration: 5s; --delay: -3s; --drift: 23px; }
+.hung-hearts span:nth-child(3) { --left: 35%; --size: 19px; --duration: 4.8s; --delay: -2s; --drift: -25px; }
+.hung-hearts span:nth-child(4) { --left: 52%; --size: 13px; --duration: 5.4s; --delay: -4s; --drift: 20px; }
+.hung-hearts span:nth-child(5) { --left: 67%; --size: 17px; --duration: 4.5s; --delay: -2.7s; --drift: -19px; }
+.hung-hearts span:nth-child(6) { --left: 80%; --size: 12px; --duration: 5.2s; --delay: -4.5s; --drift: 16px; }
+.hung-hearts span:nth-child(7) { --left: 92%; --size: 15px; --duration: 4.6s; --delay: -1.8s; --drift: -21px; }
+@keyframes hung-heart-rise {
+  0% { opacity: 0; transform: translate(0, 0) scale(.7); }
+  15% { opacity: .85; }
+  80% { opacity: .8; }
+  100% { opacity: 0; transform: translate(var(--drift), -210px) scale(1.2); }
+}
+.reader .hung-photo figcaption { font: italic 14px/1.5 var(--serif); color: #76533e; }
+.reader:is([data-feature="lam"], [data-feature="dung"]) .reader-inner {
   display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(240px, .9fr);
   align-items: center; gap: clamp(12px, 3vw, 38px); padding-top: 52px;
 }
-.reader[data-feature="lam"] .reader-body { grid-column: 1; grid-row: 1; min-width: 0; }
-.reader[data-feature="lam"] .close-reader { position: absolute; top: 12px; right: 14px; float: none; margin: 0; }
-.lam-portrait {
+.reader:is([data-feature="lam"], [data-feature="dung"]) .reader-body { grid-column: 1; grid-row: 1; min-width: 0; }
+.reader:is([data-feature="lam"], [data-feature="dung"]) .close-reader { position: absolute; top: 12px; right: 14px; float: none; margin: 0; }
+.teacher-portrait {
   position: relative; grid-column: 2; grid-row: 1; align-self: end; isolation: isolate;
   height: clamp(320px, 51dvh, 510px); min-width: 0;
   animation: lam-reveal 850ms cubic-bezier(.17,.78,.28,1) both;
@@ -216,9 +250,11 @@ h1, h2, h3, h4, p { margin: 0; }
   background: radial-gradient(ellipse at 50% 78%, #ffd665b8 0, #f68a2870 30%, #bf4b163b 55%, transparent 76%);
   filter: blur(17px); animation: lam-glow 1800ms ease-in-out infinite alternate;
 }
-.lam-portrait img {
+.teacher-portrait img {
   position: relative; z-index: 2; display: block; width: 100%; height: 100%;
   object-fit: contain; object-position: center bottom;
+}
+.lam-portrait img {
   filter: drop-shadow(0 8px 12px #522a2080) drop-shadow(0 0 12px #ffad5b80);
 }
 .lam-flames { position: absolute; inset: 0 -8%; z-index: -1; overflow: hidden; pointer-events: none; }
@@ -242,6 +278,56 @@ h1, h2, h3, h4, p { margin: 0; }
   from { transform: rotate(-12deg) scale(.78,.78); opacity: .55; }
   to { transform: rotate(12deg) scale(1.05,1.1); opacity: .95; }
 }
+.dung-portrait img { filter: drop-shadow(0 9px 10px #34452b70); }
+.dung-grove { position: absolute; inset: 0 -6%; z-index: 0; pointer-events: none; }
+.dung-bush {
+  position: absolute; bottom: 4%; left: -3%; width: 50%; height: 46%; transform-origin: 50% 100%;
+  filter: drop-shadow(0 6px 6px #39462955); animation: dung-sway 2.8s ease-in-out infinite alternate;
+}
+.dung-bush svg { display: block; width: 100%; height: 100%; }
+.dung-bush:last-child { left: auto; right: -3%; height: 54%; animation-delay: -1.3s; }
+.dung-rifle {
+  position: absolute; top: 18%; right: 7%; z-index: 1; width: 22%; height: 67%;
+  transform: rotate(11deg); filter: drop-shadow(2px 3px 3px #35402c80);
+}
+.dung-rifle svg, .dung-hat svg, .dung-callout svg { display: block; width: 100%; height: 100%; }
+.dung-hat { position: absolute; z-index: 3; left: 37%; top: 6%; width: 38%; height: 16%; filter: drop-shadow(0 3px 3px #2a332880); }
+.dung-callout {
+  position: absolute; z-index: 4; right: -7%; top: 16%; color: #52613a;
+  font: 700 13px var(--serif); letter-spacing: .09em; white-space: nowrap;
+  text-shadow: 0 1px 0 #fff3d2; transform: rotate(-7deg);
+}
+.dung-callout svg { width: 100px; height: 67px; margin-left: -57px; margin-top: 2px; }
+@keyframes dung-sway { from { transform: rotate(-5deg) scale(.97); } to { transform: rotate(5deg) scale(1.04); } }
+.reader[data-feature="tuan"] { width: min(1020px, calc(100% - 30px)); }
+.reader[data-feature="tuan"] .reader-inner {
+  display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(260px, 1fr);
+  align-items: center; gap: clamp(12px, 3vw, 38px); padding-top: 52px;
+}
+.reader[data-feature="tuan"] .reader-body { grid-column: 1; grid-row: 1; min-width: 0; }
+.reader[data-feature="tuan"] .close-reader { position: absolute; top: 12px; right: 14px; float: none; margin: 0; }
+.tuan-portrait {
+  height: clamp(330px, 53dvh, 510px);
+  background: radial-gradient(ellipse at center, #85b9a669, transparent 70%);
+}
+.tuan-portrait img {
+  width: 100%; height: 100%; object-fit: contain; object-position: center bottom;
+  filter: drop-shadow(0 12px 15px #123f3b80) drop-shadow(0 0 12px #61ccba66);
+}
+.tuan-network { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.tuan-network svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.network-line {
+  stroke: #31a99d; stroke-width: 3; stroke-dasharray: 9 12;
+  animation: tuan-data 2.3s linear infinite;
+}
+.network-node { fill: #a8ffdf; filter: drop-shadow(0 0 6px #35d7b8); }
+.network-server { fill: #193e45; stroke: #72d5c2; stroke-width: 3; filter: drop-shadow(0 0 8px #39b3a8); }
+.network-server circle { fill: #b8ffce; stroke: none; }
+.network-shield, .network-lock { fill: #173d42; stroke: #b2f3cc; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+.network-shield path:last-child { fill: none; }
+.network-shield { animation: tuan-pulse 2.8s ease-in-out infinite alternate; }
+@keyframes tuan-data { to { stroke-dashoffset: -42; } }
+@keyframes tuan-pulse { to { filter: drop-shadow(0 0 14px #66efc5); } }
 .reader[data-kind="photo"] .story article { position: relative; padding: 18px; border-radius: 12px; background: #e8eddf; }
 .reader[data-kind="photo"] .story article::before {
   content: ""; position: absolute; top: -10px; left: 24px; border-width: 0 10px 11px;
@@ -276,9 +362,16 @@ h1, h2, h3, h4, p { margin: 0; }
 .quiet { color: #615f51; }
 
 @media (max-width: 720px) {
-  .reader[data-feature="lam"] .reader-inner { grid-template-columns: minmax(0, 1fr); gap: 2px; padding-top: 52px; }
-  .reader[data-feature="lam"] .lam-portrait { grid-column: 1; grid-row: 1; height: min(30dvh, 245px); width: min(220px, 72%); justify-self: center; }
-  .reader[data-feature="lam"] .reader-body { grid-column: 1; grid-row: 2; }
+  .reader[data-feature="tuan"] .reader-inner { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .reader[data-feature="tuan"] .teacher-portrait { grid-column: 1; grid-row: 1; height: min(32dvh, 250px); width: min(250px, 85%); justify-self: center; }
+  .reader[data-feature="tuan"] .reader-body { grid-column: 1; grid-row: 2; }
+  .reader[data-feature="hung"] .reader-inner { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .reader[data-feature="hung"] .hung-photo { grid-column: 1; grid-row: 1; width: min(270px, 85%); justify-self: center; margin-top: 0; }
+  .reader[data-feature="hung"] .reader-body { grid-column: 1; grid-row: 2; }
+  .reader .hung-photo img { max-height: 28dvh; }
+  .reader:is([data-feature="lam"], [data-feature="dung"]) .reader-inner { grid-template-columns: minmax(0, 1fr); gap: 2px; padding-top: 52px; }
+  .reader:is([data-feature="lam"], [data-feature="dung"]) .teacher-portrait { grid-column: 1; grid-row: 1; height: min(30dvh, 245px); width: min(220px, 72%); justify-self: center; }
+  .reader:is([data-feature="lam"], [data-feature="dung"]) .reader-body { grid-column: 1; grid-row: 2; }
   .experience { --dock-bottom: max(11px, calc(env(safe-area-inset-bottom) + 6px)); }
   .hud-top { top: max(12px, calc(env(safe-area-inset-top) + 6px)); }
   .intro { right: var(--edge); max-width: 380px; }
@@ -316,3 +409,9 @@ h1, h2, h3, h4, p { margin: 0; }
 [data-reduced] *, [data-reduced] *::before, [data-reduced] *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
 @media (prefers-reduced-motion: reduce) { .lam-portrait, .lam-portrait::before, .lam-flame { animation: none !important; } }
 [data-reduced] .lam-portrait, [data-reduced] .lam-portrait::before, [data-reduced] .lam-flame { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .dung-portrait, .dung-bush { animation: none !important; } }
+[data-reduced] .dung-portrait, [data-reduced] .dung-bush { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .hung-hearts span { animation: none !important; opacity: .7; transform: translateY(-25px); } }
+[data-reduced] .hung-hearts span { animation: none !important; opacity: .7; transform: translateY(-25px); }
+@media (prefers-reduced-motion: reduce) { .tuan-network *, .tuan-portrait { animation: none !important; } }
+[data-reduced] .tuan-network *, [data-reduced] .tuan-portrait { animation: none !important; }

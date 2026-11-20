@@ -190,11 +190,13 @@ function poster(room: T.Group) {
 
 function makeCard(group: T.Group, entry: Memory, targets: T.Object3D[], cards: Map<string, { kind: 'card'; root: T.Group; body: T.Mesh; reset: () => void }>, invalidate: () => void) {
   const first = entry.slot === 0
+  const threeNotes = entry.year === 3
   const card = new T.Group()
   group.add(card)
-  card.position.set(first ? -0.69 : 0.69, first ? -0.065 : -0.13, 0.105)
-  card.scale.setScalar(1.24)
-  card.rotation.z = first ? 0.075 : -0.1
+  card.position.set(threeNotes ? [-1.05, 0, 1.05][entry.slot] : first ? -0.69 : 0.69,
+    threeNotes ? [-0.08, -0.13, -0.09][entry.slot] : first ? -0.065 : -0.13, 0.105)
+  card.scale.setScalar(threeNotes ? 0.94 : 1.24)
+  card.rotation.z = threeNotes ? [0.065, -0.045, 0.055][entry.slot] : first ? 0.075 : -0.1
   const photo = entry.kind === 'photo'
   const halo = surface(card, 1.2, 1.05, [0, 0, -0.005], (ctx, w, h) => {
     const glow = ctx.createRadialGradient(w / 2, h / 2, w * 0.21, w / 2, h / 2, w * 0.48)
@@ -243,7 +245,8 @@ function makeCard(group: T.Group, entry: Memory, targets: T.Object3D[], cards: M
       wrapped(ctx, entry.previewText ?? entry.body?.join(' ') ?? 'Nội dung đang chờ bổ sung.', w - 88, 44, entry.recipient ? 167 : 154, 35, 5)
     })
   }
-  shape(group, sphere, mat(first ? '#8f4e37' : '#697554'), [0.05, 0.05, 0.028], [card.position.x + 0.03, card.position.y + 0.48, 0.15])
+  shape(group, sphere, mat(first ? '#8f4e37' : '#697554'), [0.05, 0.05, 0.028],
+    [card.position.x + 0.03, card.position.y + (threeNotes ? 0.37 : 0.48), 0.15])
   card.userData.target = paper.userData.target
   const back = surface(card, 0.89, 0.74, [0, 0, -0.021], (ctx, w, h) => {
     ctx.fillStyle = photo ? '#efe1c5' : '#e7c99b'

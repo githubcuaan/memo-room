@@ -3,7 +3,7 @@ export type Photo = { src: string; thumbnail?: string; alt: string; caption?: st
 export type Memory = {
   id: string
   year: Year | null
-  slot: 0 | 1
+  slot: 0 | 1 | 2
   kind: 'photo' | 'note' | 'pending'
   title: string
   label?: string
@@ -79,16 +79,75 @@ export const memories: Memory[] = [
       alt: 'Cô Vân chụp cùng lớp trong phòng học.',
     },
   },
-  { id: 'y3-note-a', year: 3, slot: 0, kind: 'note', title: 'Note Kim Thành' },
-  { id: 'y3-note-b', year: 3, slot: 1, kind: 'note', title: 'Note Trịnh Thành' },
-  { id: 'y4-photo', year: 4, slot: 0, kind: 'photo', title: 'Ảnh Kim Tuấn' },
-  { id: 'y4-reserved', year: 4, slot: 1, kind: 'note', title: 'Note bí mật' },
+  {
+    id: 'y3-note-a', year: 3, slot: 0, kind: 'note',
+    title: 'Đồ Án killer', label: 'Note Kim Thành', recipient: 'Nguyễn Kim Thành',
+    previewText: 'Em có cơ duyên với thầy nhờ mấy anh em mời làm đồ án cùng, làm cùng đê mê luôn, làm luôn đồ án liên ngành =))',
+    body: [
+      'Em có cơ duyên với thầy nhờ mấy anh em mời làm đồ án cùng, làm cùng đê mê luôn, làm luôn đồ án liên ngành =))',
+      'Phong cách làm việc chuyên nghiệp nhưng rất sáng tạo, đổi mới. Siêu hợp mấy ae genz.',
+      'Em còn đang nợ thầy 2 dự án ma\n- Nghiên cứu khoa học\n- Startup sinh viên =))',
+      'không thể tiếp tục do các thành viên đã có công việc riêng và dần tan rã. Em vẫn RẤT còn muốn thực hiện 2 dự án ma này với thầy, nếu thầy có đọc được lá thư này và rảnh rỗi để bỏ thời gian cho em thì thầy cân nhắc nhaaaa.',
+    ],
+  },
+  {
+    id: 'y3-note-b', year: 3, slot: 1, kind: 'note',
+    title: 'Chúa Data', label: 'Note Trịnh Thành', recipient: 'Trịnh Thành',
+    previewText: 'Lần đầu tiên em quyết định thử làm researcher, người em apply là thầy.',
+    body: [
+      'Lần đầu tiên em quyết định thử làm researcher, người em apply là thầy. Em thích phong cách giảng dạy của thầy, và phong cách nói chuyện của thầy nứa =))',
+      'Do bản thân còn thiếu sót nên không thể tiếp tục làm cùng thầy, dẫu vậy trong quá trình đó em vẫn học được rất nhiều thứ !',
+      'Em để note của thầy là chúa data vì mấy ae nào mà xin recomment thầy cô mấy môn data là em réo tên thầy hết :)',
+      'Chúc thầy công tác tốt, tiếp tục carry mấy ae researcher lên trình lên người !',
+    ],
+  },
+  {
+    id: 'y3-note-c', year: 3, slot: 2, kind: 'note',
+    title: 'Chất', label: 'Note thầy Dũng', recipient: 'Phạm Trung Dũng',
+    previewText: 'Nếu chỉ được dùng một từ cho thầy, em xin phép dùng từ "Chất".',
+    body: [
+      'Nếu chỉ được dùng một từ cho thầy, em xin phép dùng từ "Chất".',
+      'Họ Phạm giống em là biết rồi, nhắc tới tên học sinh nào cũng phải dè chừng =)))',
+      'Em học 2 lần DSA đều của thầy không phải vì trượt, mà môn này em không được A+ tối vắt tay lên trán suy nghĩ không ngủ được :)',
+      'Thầy cũng là người dẫn đoàn cho mấy anh em đi thi olympic tin học năm ngoái, trong đó có em.',
+      'note: có mấy bức ảnh năm ngoái mà em bị mất mất rùi huhuhu',
+      'Chúc thầy sức khoẻ công tác tốt, giữ vững quan điểm giảng dạy và tiếp tục hỗ trợ nhiều học sinh !',
+    ],
+  },
+  {
+    id: 'y4-photo', year: 4, slot: 0, kind: 'photo',
+    title: 'nhậuuuu', label: 'Ảnh kỉ niệm cùng thầy Tuấn',
+    noteTitle: 'Trao Cơ Hội', recipient: 'Nguyễn Kim Tuấn',
+    body: [
+      'Người đã trao cho em cơ hội để ra thao trường trinh chiến năm ngoái. Em đã thất bại.',
+      'Tiếp nối sau câu truyện đó, thầy vẫn trao cho em một cơ hội nữa để thể hiện bản thân ở Olympic tin học toàn quốc năm nay. Không có lời nào có thể diễn tả tâm trạng của em lúc này.',
+      'Cảm ơn thầy đã trao niềm tin ở nơi em, em sẽ cố gắng hết sức để không phụ lòng thầy.',
+      'Chúc thầy Kim Tuấn 20-11 sức khoẻ, nhiều niềm vui trong công việc, dẫn dắt mấy anh em bảo mật phát triển rực rỡ !',
+    ],
+    photo: {
+      src: `${import.meta.env.BASE_URL}anh/nhau-nam-4.webp`,
+      thumbnail: `${import.meta.env.BASE_URL}anh/nhau-nam-4-nho.webp`,
+      alt: 'Thầy Tuấn và các bạn sinh viên cùng nâng ly bên bàn ăn.',
+    },
+  },
+  {
+    id: 'y4-reserved', year: 4, slot: 1, kind: 'note', title: 'Note bí mật',
+    previewText: 'Nhất tự vi sư, bán tự vi sư.',
+    body: [
+      'Nhất tự vi sư, bán tự vi sư.',
+      'Shout out cho anh Nguyễn Chí Công với học phần Giao Diện Người Máy.',
+      'Mặc dù anh không trực tiếp giúp em ý tưởng này nhưng nhờ buổi thảo luận về threejs em mới có được ý tưởng này',
+      'Chúc anh sức khoẻ công tác tốt 2286 mãi mãi phát lộc.',
+    ],
+  },
 ]
 export const tribute: Memory = {
   id: 'tribute', year: null, slot: 0, kind: 'note', title: 'Thư gửi thầy cô',
   body: [
-    'Nhân ngày 20/11, chúng em xin gửi lời cảm ơn tới thầy cô vì đã dành thời gian, sự kiên nhẫn và niềm tin cho chúng em.',
-    'Kính chúc thầy cô luôn mạnh khỏe, bình an và có thật nhiều niềm vui bên những thế hệ học trò.',
+    'Hối tiếc lớn nhất của em khi làm sản phẩm này là không thể gửi lời chúc đến tất cả các thầy cô.',
+    'Nhân dịp 20/11 này, em xin chúc toàn thể các thầy cô trường Phenikaa dù đã dạy em hay chưa, dù em đã gặp hay chưa, sẽ có một ngày thật tuyệt, sức khoẻ lúc nào cũng phải tốt để có thế tiếp tục dẫn lối chúng em trên con đường học tập.',
+    'Nghề nhà giáo luôn là một trong những ngành nghề em tôn trọng nhất trên cuộc đời này.',
+    'Peace,\nPhạm Lê Đình An',
   ],
 }
 export const narrators: Record<string, { name: string; avatar?: string }> = {
