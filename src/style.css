@@ -198,7 +198,50 @@ h1, h2, h3, h4, p { margin: 0; }
 .reader-inner { position: relative; padding: 35px clamp(17px, 5vw, 42px); }
 .reader[data-kind="note"] { background: #f5e8cc; }
 .reader[data-kind="note"] .reader-inner { background: repeating-linear-gradient(to bottom, transparent 0 35px, #bca77b38 36px 37px); }
-.reader[data-kind="note"] .reader-body > p { font-family: var(--serif); font-size: 16px; }
+.reader[data-kind="note"] .reader-body > p { font-family: var(--serif); font-size: 16px; white-space: pre-line; }
+.reader[data-feature="lam"] { width: min(970px, calc(100% - 30px)); }
+.reader[data-feature="lam"] .reader-inner {
+  display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(240px, .9fr);
+  align-items: center; gap: clamp(12px, 3vw, 38px); padding-top: 52px;
+}
+.reader[data-feature="lam"] .reader-body { grid-column: 1; grid-row: 1; min-width: 0; }
+.reader[data-feature="lam"] .close-reader { position: absolute; top: 12px; right: 14px; float: none; margin: 0; }
+.lam-portrait {
+  position: relative; grid-column: 2; grid-row: 1; align-self: end; isolation: isolate;
+  height: clamp(320px, 51dvh, 510px); min-width: 0;
+  animation: lam-reveal 850ms cubic-bezier(.17,.78,.28,1) both;
+}
+.lam-portrait::before {
+  content: ""; position: absolute; inset: 14% -12% 0; z-index: -2;
+  background: radial-gradient(ellipse at 50% 78%, #ffd665b8 0, #f68a2870 30%, #bf4b163b 55%, transparent 76%);
+  filter: blur(17px); animation: lam-glow 1800ms ease-in-out infinite alternate;
+}
+.lam-portrait img {
+  position: relative; z-index: 2; display: block; width: 100%; height: 100%;
+  object-fit: contain; object-position: center bottom;
+  filter: drop-shadow(0 8px 12px #522a2080) drop-shadow(0 0 12px #ffad5b80);
+}
+.lam-flames { position: absolute; inset: 0 -8%; z-index: -1; overflow: hidden; pointer-events: none; }
+.lam-flame {
+  position: absolute; left: calc(-6% + var(--i) * 13%); bottom: 1%;
+  width: 26%; height: 58%; transform-origin: 50% 100%;
+  clip-path: polygon(51% 0, 68% 25%, 60% 53%, 79% 32%, 100% 69%, 91% 96%, 67% 100%, 14% 100%, 0 79%, 18% 52%, 31% 70%, 35% 30%);
+  background: radial-gradient(ellipse at 52% 84%, #fff3ad 0 10%, #ffc158 33%, #f47729 67%, #b93a19a6 95%);
+  filter: blur(2px); opacity: .78;
+  animation: lam-flame-dance 1250ms ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * -180ms);
+}
+.lam-flame:nth-child(2n) { height: 70%; animation-duration: 1550ms; }
+.lam-flame:nth-child(3n) { height: 48%; animation-duration: 1050ms; }
+@keyframes lam-reveal {
+  from { opacity: 0; transform: translateY(36px) scale(.93); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes lam-glow { from { opacity: .7; transform: scale(.92); } to { opacity: 1; transform: scale(1.08); } }
+@keyframes lam-flame-dance {
+  from { transform: rotate(-12deg) scale(.78,.78); opacity: .55; }
+  to { transform: rotate(12deg) scale(1.05,1.1); opacity: .95; }
+}
 .reader[data-kind="photo"] .story article { position: relative; padding: 18px; border-radius: 12px; background: #e8eddf; }
 .reader[data-kind="photo"] .story article::before {
   content: ""; position: absolute; top: -10px; left: 24px; border-width: 0 10px 11px;
@@ -233,6 +276,9 @@ h1, h2, h3, h4, p { margin: 0; }
 .quiet { color: #615f51; }
 
 @media (max-width: 720px) {
+  .reader[data-feature="lam"] .reader-inner { grid-template-columns: minmax(0, 1fr); gap: 2px; padding-top: 52px; }
+  .reader[data-feature="lam"] .lam-portrait { grid-column: 1; grid-row: 1; height: min(30dvh, 245px); width: min(220px, 72%); justify-self: center; }
+  .reader[data-feature="lam"] .reader-body { grid-column: 1; grid-row: 2; }
   .experience { --dock-bottom: max(11px, calc(env(safe-area-inset-bottom) + 6px)); }
   .hud-top { top: max(12px, calc(env(safe-area-inset-top) + 6px)); }
   .intro { right: var(--edge); max-width: 380px; }
@@ -268,3 +314,5 @@ h1, h2, h3, h4, p { margin: 0; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; } }
 [data-reduced] *, [data-reduced] *::before, [data-reduced] *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+@media (prefers-reduced-motion: reduce) { .lam-portrait, .lam-portrait::before, .lam-flame { animation: none !important; } }
+[data-reduced] .lam-portrait, [data-reduced] .lam-portrait::before, [data-reduced] .lam-flame { animation: none !important; }

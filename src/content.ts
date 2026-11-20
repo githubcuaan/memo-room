@@ -44,23 +44,35 @@ export class ContentPanel {
   }
   show(memory: Memory, trigger: HTMLElement) {
     this.returnFocus = trigger
-    this.dialog.dataset.kind = memory.kind
-    const heading = node('h2', memory.title)
+    const photoNote = memory.kind === 'photo'
+    this.dialog.dataset.kind = photoNote ? 'note' : memory.kind
+    if (memory.id === 'y1-photo') this.dialog.dataset.feature = 'lam'
+    else delete this.dialog.dataset.feature
+    const heading = node('h2', memory.noteTitle ?? memory.title)
     heading.id = 'reader-title'
-    this.body.replaceChildren(node('div', memory.year ? `CHƯƠNG 0${memory.year} / ${memory.kind === 'photo' ? 'ẢNH' : 'KỶ NIỆM'}` : '20/11 / LỜI TRI ÂN', 'eyebrow'), heading)
+    this.body.replaceChildren(node('div', memory.year ? `CHƯƠNG 0${memory.year} / ${photoNote ? 'LỜI NHẮN' : memory.kind === 'photo' ? 'ẢNH' : 'KỶ NIỆM'}` : '20/11 / LỜI TRI ÂN', 'eyebrow'), heading)
     if (memory.recipient) this.body.append(node('p', memory.recipient, 'recipient'))
-    if (memory.photo) {
-      this.body.append(picture(memory.photo))
-    } else if (memory.kind === 'photo') {
-      const placeholder = node('div', undefined, 'empty-photo')
-      placeholder.innerHTML = `${icon('image', 36)}<span>Chưa có ảnh chính thức</span>`
-      this.body.append(placeholder)
-    }
     for (const paragraph of memory.body ?? []) this.body.append(node('p', paragraph))
-    const related = stories.filter((story) => story.memoryId === memory.id && (preview || !story.sample))
+    const related = photoNote ? [] : stories.filter((story) => story.memoryId === memory.id && (preview || !story.sample))
     if (related.length) this.body.append(this.storyPicker(related))
     else if (!memory.body?.length) {
-      this.body.append(node('p', memory.kind === 'pending' ? 'Vị trí này được giữ lại cho một kỷ niệm sẽ bổ sung sau.' : 'Nội dung kỷ niệm sẽ được bổ sung sau.', 'quiet'))
+      this.body.append(node('p', memory.kind === 'pending' ? 'Vị trí này được giữ lại cho một kỷ niệm sẽ bổ sung sau.' : photoNote ? 'Lời nhắn đang chờ bổ sung.' : 'Nội dung kỷ niệm sẽ được bổ sung sau.', 'quiet'))
+    }
+    this.dialog.querySelector('.lam-portrait')?.remove()
+    if (memory.id === 'y1-photo') {
+      const portrait = node('div', undefined, 'lam-portrait')
+      const flames = node('div', undefined, 'lam-flames')
+      flames.setAttribute('aria-hidden', 'true')
+      for (let i = 0; i < 9; i++) {
+        const flame = node('span', undefined, 'lam-flame')
+        flame.style.setProperty('--i', String(i))
+        flames.append(flame)
+      }
+      const image = node('img')
+      image.src = `${import.meta.env.BASE_URL}anh/thay-lam.webp`
+      image.alt = 'Chân dung thầy Phạm Tiến Lâm'
+      portrait.append(flames, image)
+      this.dialog.querySelector('.reader-inner')!.append(portrait)
     }
     this.dialog.showModal()
     this.dialog.scrollTop = 0
