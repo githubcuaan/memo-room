@@ -8,7 +8,7 @@ export class SceneManager {
   private renderer: T.WebGLRenderer
   private scene = new T.Scene()
   private room = new T.Group()
-  private rooms = new Map<Year, { root: T.Group; window: T.Group; updateWeather: (time: number) => void; targets: T.Object3D[]; envelope: Envelope; cards: Map<string, Extract<Inspectable, { kind: 'card' }>>; solids: T.Object3D[] }>()
+  private rooms = new Map<Year, { root: T.Group; window: T.Group; updateWeather: (time: number) => void; targets: T.Object3D[]; envelope: Envelope; letterEntrance?: { dock: T.Group; aura: T.Mesh<T.BufferGeometry, T.MeshBasicMaterial>; light: T.PointLight }; cards: Map<string, Extract<Inspectable, { kind: 'card' }>>; solids: T.Object3D[] }>()
   private currentYear: Year = 1
   private camera = new CameraController()
   private targets: T.Object3D[] = []
@@ -31,6 +31,7 @@ export class SceneManager {
   private hovered?: T.Group
   private hoverStates = new Map<T.Group, { position: T.Vector3; scale: number; value: number; target: number; glow?: T.Mesh }>()
   private lastFrame = 0
+  private letterReveal?: { dock: T.Group; aura: T.Mesh<T.BufferGeometry, T.MeshBasicMaterial>; light: T.PointLight; start: number; restY: number }
 
   constructor(private host: HTMLElement, private canPick: () => boolean,
     private select: (target: Target) => void, private failed: () => void) {
@@ -70,6 +71,7 @@ export class SceneManager {
     this.camera.reduced = reduced
     if (reduced) {
       if (this.moving) this.camera.finish()
+      this.finishLetterReveal()
       this.invalidate()
     }
   }
@@ -77,15 +79,19 @@ export class SceneManager {
     this.setHovered()
     this.renderer.domElement.style.cursor = ''
     if (typeof view === 'number') this.activateRoom(view)
-    else this.room.visible = view !== 'welcome'
+    else {
+      this.finishLetterReveal()
+      this.room.visible = view !== 'welcome'
+    }
     this.camera.go(view, detail)
     this.invalidate()
   }
   private activateRoom(year: Year) {
+    if (year !== 4) this.finishLetterReveal()
     let variant = this.rooms.get(year)
     if (!variant) {
       const root = new T.Group()
-      const { targets, envelope, cards, window, updateWeather } = buildRoom(root, year, this.invalidate)
+      const { targets, envelope, letterEntrance, cards, window, updateWeather } = buildRoom(root, year, this.invalidate)
       const solids: T.Object3D[] = []
       root.traverse((object) => {
         if (object instanceof T.Mesh && object.material instanceof T.MeshStandardMaterial) solids.push(object)
@@ -93,9 +99,10 @@ export class SceneManager {
       this.scene.add(root)
       this.layoutRoom(root, window, this.host.clientWidth / this.host.clientHeight)
       root.updateMatrixWorld(true)
-      variant = { root, window, updateWeather, targets, envelope, cards, solids }
+      variant = { root, window, updateWeather, targets, envelope, letterEntrance, cards, solids }
       this.rooms.set(year, variant)
     }
+    const entering = this.room !== variant.root || !this.room.visible
     this.room.visible = false
     this.room = variant.root
     this.room.visible = true
@@ -104,6 +111,42 @@ export class SceneManager {
     this.envelope = variant.envelope
     this.cards = variant.cards
     this.solids = variant.solids
+    if (entering && variant.letterEntrance) this.startLetterReveal(variant.letterEntrance)
+  }
+  private startLetterReveal({ dock, aura, light }: { dock: T.Group; aura: T.Mesh<T.BufferGeometry, T.MeshBasicMaterial>; light: T.PointLight }) {
+    this.letterReveal = { dock, aura, light, start: performance.now(), restY: 1.51 }
+    if (this.camera.reduced) {
+      this.finishLetterReveal()
+      return
+    }
+    dock.scale.setScalar(0.12)
+    dock.position.y = 1.21
+    aura.material.opacity = 0
+    light.intensity = 0
+    this.invalidate()
+  }
+  private finishLetterReveal() {
+    if (!this.letterReveal) return
+    const { dock, aura, light, restY } = this.letterReveal
+    dock.scale.setScalar(1)
+    dock.position.y = restY
+    aura.material.opacity = 1
+    light.intensity = 0.75
+    this.letterReveal = undefined
+  }
+  private updateLetterReveal(time: number) {
+    if (!this.letterReveal) return false
+    const { dock, aura, light, start, restY } = this.letterReveal
+    // The room transition still covers the table at first. Reveal the letter
+    // as that veil lifts, so the new arrival is visible rather than hidden.
+    const t = T.MathUtils.clamp((time - start - 800) / 1550, 0, 1)
+    const eased = t * t * (3 - 2 * t)
+    dock.scale.setScalar(0.12 + 0.88 * eased + Math.sin(Math.PI * t) * 0.1)
+    dock.position.y = restY - 0.3 * (1 - eased)
+    aura.material.opacity = eased
+    light.intensity = 0.75 * eased + Math.sin(Math.PI * t) * 1.15
+    if (t === 1) this.finishLetterReveal()
+    return Boolean(this.letterReveal)
   }
   private layoutRoom(root: T.Group, window: T.Group, aspect: number) {
     const narrow = aspect < 0.75
@@ -218,11 +261,12 @@ export class SceneManager {
   private render = (time: number) => {
     this.request = 0
     this.camera.update(time)
+    const revealing = this.updateLetterReveal(time)
     const hovering = this.updateHover(time)
     this.renderer.render(this.scene, this.camera.camera)
     const inspectionMoving = this.inspection?.update(time, this.camera.reduced)
     this.inspection?.render(this.renderer)
-    if (this.moving || inspectionMoving || hovering) this.invalidate()
+    if (this.moving || inspectionMoving || hovering || revealing) this.invalidate()
   }
   private resize = () => {
     const { clientWidth: width, clientHeight: height } = this.host

@@ -383,6 +383,7 @@ export function buildRoom(room: T.Group, year: Year, invalidate: () => void) {
   }
   const envelopeDock = new T.Group()
   table.add(envelopeDock)
+  envelopeDock.visible = year === 4
   envelopeDock.position.set(0.27, 1.51, 0.14)
   envelopeDock.rotation.y = -0.25
   const aura = surface(envelopeDock, 1.85, 1.35, [0, -0.023, 0], (ctx, w, h) => {
@@ -404,8 +405,10 @@ export function buildRoom(room: T.Group, year: Year, invalidate: () => void) {
   envelope.root.rotation.x = -Math.PI / 2
   envelope.root.scale.setScalar(0.308)
   envelopeDock.add(envelope.root)
-  envelope.body.userData.target = { memory: tribute } satisfies Target
-  targets.push(envelope.body)
+  if (year === 4) {
+    envelope.body.userData.target = { memory: tribute } satisfies Target
+    targets.push(envelope.body)
+  }
   for (const [i, color] of ['#765740', '#9e6b57', '#75866c'].entries()) {
     const book = box(table, color, [0.49, 0.071, 0.35], [-0.63, 1.505 + i * 0.072, -0.1])
     book.rotation.y = i * 0.16 - 0.2
@@ -414,5 +417,5 @@ export function buildRoom(room: T.Group, year: Year, invalidate: () => void) {
   plant(room, -4.11, 0.04, -1.76, 0.84, '#9c6d52')
   plant(room, 3.58, 0.04, -1.77, 1.47)
   plant(table, -0.53, 1.47, -0.44, 0.41, '#d6bb8f')
-  return { targets, envelope, cards, window, updateWeather }
+  return { targets, envelope, letterEntrance: year === 4 ? { dock: envelopeDock, aura, light: warmLight } : undefined, cards, window, updateWeather }
 }

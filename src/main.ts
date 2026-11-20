@@ -30,8 +30,6 @@ app.innerHTML = `
         <span><strong>Phòng ký ức</strong><small id="stage-label">ĐANG MỞ PHÒNG</small></span>
       </button>
       <div class="header-actions">
-        <a class="hud-button" href="?che-do=doc" aria-label="Mở bản đọc" title="Mở bản đọc">${icon("book", 18)}</a>
-        <button class="hud-button" id="motion" aria-label="Giảm chuyển động" title="Giảm chuyển động">${icon("motion", 19)}</button>
         <button class="hud-button" id="sound"></button>
       </div>
     </div>
@@ -70,6 +68,7 @@ app.innerHTML = `
         <span class="transition-footnote">Chúng mình đã đi qua thêm một mùa…</span>
       </div>
     </div>
+    <div class="letter-arrival" id="letter-arrival" hidden>${icon("mail", 18)} Một lá thư vừa xuất hiện trên bàn</div>
     <section class="inspect-hud" id="letter-inspect" aria-label="Xem kỷ niệm" hidden>
       <button class="hud-button inspect-close" id="put-letter-back" aria-label="Đặt kỷ niệm về chỗ cũ" title="Đặt về chỗ cũ">${icon("close", 19)}</button>
       <div class="inspect-actions">
@@ -90,7 +89,6 @@ const announcement = get("announcement");
 const chapterButtons = [...app.querySelectorAll<HTMLButtonElement>(".chapter")];
 const audio = new AudioManager();
 const sound = get<HTMLButtonElement>("sound");
-const motion = get<HTMLButtonElement>("motion");
 const mediaMotion = matchMedia("(prefers-reduced-motion: reduce)");
 const views = [1, 2, 3, 4] as const;
 let view: View = "welcome";
@@ -106,6 +104,8 @@ let readingMessage = "";
 let welcomeState: "lifting" | "sealed" | "opening" | "expanded" = "lifting";
 const invitation = get("invitation");
 const transition = get("room-transition");
+const letterArrival = get("letter-arrival");
+let letterArrivalTimer: number | undefined;
 let changingRoom = false;
 let transitionTarget: { year: Year; focus: boolean } | undefined;
 let transitionTimers: number[] = [];
@@ -127,26 +127,16 @@ const content = new ContentPanel(() => {
 });
 
 function reduced() {
-  return mediaMotion.matches || preference("reduced");
+  return mediaMotion.matches;
 }
 function setMotion() {
   const active = reduced();
   document.documentElement.toggleAttribute("data-reduced", active);
-  motion.setAttribute("aria-pressed", String(active));
-  motion.title = mediaMotion.matches
-    ? "Đang giảm chuyển động theo cài đặt thiết bị"
-    : "Giảm chuyển động";
-  motion.setAttribute("aria-disabled", String(mediaMotion.matches));
   scene?.setReduced(active);
   if (active && changingRoom) finishRoomTransition();
 }
 setMotion();
 mediaMotion.addEventListener("change", setMotion);
-motion.addEventListener("click", () => {
-  if (mediaMotion.matches) return;
-  preference("reduced", !reduced());
-  setMotion();
-});
 
 function paintSound() {
   sound.innerHTML = icon(soundEnabled ? "sound" : "mute", 18);
@@ -226,9 +216,10 @@ function renderStage() {
     mode === "loading"
       ? "ĐANG MỞ PHÒNG"
       : mode === "reading"
-        ? "CHẾ ĐỘ ĐỌC"
+        ? "KHÔNG CÓ 3D"
         : "KHÔNG GIAN 3D";
   get("stage-controls").hidden = view === "welcome";
+  get("open-letter").hidden = view !== 4;
   get<HTMLButtonElement>("previous").disabled =
     view === 1 || view === "welcome";
   get<HTMLButtonElement>("next").disabled = view === 4 || view === "welcome";
@@ -240,10 +231,7 @@ function renderStage() {
   stageMid.classList.toggle("is-visible", mode !== "scene");
   if (mode === "loading") {
     stageMid.innerHTML =
-      '<span class="loading-dot"></span><p>Đang chuẩn bị căn phòng…</p><button id="read-instead">Đọc nội dung không cần 3D</button>';
-    get("read-instead").addEventListener("click", () =>
-      useReading("Bạn vẫn có thể mở đủ bốn chương và thư tri ân."),
-    );
+      '<span class="loading-dot"></span><p>Đang chuẩn bị căn phòng…</p>';
   } else if (mode === "reading") {
     stageMid.innerHTML = `<div class="fallback-art" aria-hidden="true"><img alt="" src="${import.meta.env.BASE_URL}phong-ky-uc.webp"></div><div class="fallback-note"><p id="fallback-message"></p><button id="retry-3d">Thử mở lại 3D</button></div>`;
     get("fallback-message").textContent = readingMessage;
@@ -323,7 +311,17 @@ function finishRoomTransition() {
   transition.hidden = true;
   transition.classList.remove("is-visible", "is-leaving");
   setRoomTransitionBusy(false);
+  if (target?.year === 4) {
+    announcement.textContent = "Một lá thư vừa xuất hiện trên bàn năm 4.";
+    if (mode === "scene") showLetterArrival();
+  }
   if (target?.focus) get("hero-title").focus({ preventScroll: true });
+}
+
+function showLetterArrival() {
+  window.clearTimeout(letterArrivalTimer);
+  letterArrival.hidden = false;
+  letterArrivalTimer = window.setTimeout(() => (letterArrival.hidden = true), 4000);
 }
 
 function startRoomTransition(year: Year, focus: boolean) {
@@ -352,6 +350,8 @@ function startRoomTransition(year: Year, focus: boolean) {
 }
 
 function applyView(next: View, focus = false) {
+  window.clearTimeout(letterArrivalTimer);
+  letterArrival.hidden = true;
   if (view === "welcome" && next !== "welcome" && audio.saved && !soundRequest)
     void setSound(true);
   boardFocused = false;
@@ -359,6 +359,7 @@ function applyView(next: View, focus = false) {
   renderIntro();
   renderStage();
   scene?.go(next);
+  if (next === 4 && mode === "scene" && reduced()) showLetterArrival();
   if (next === "welcome" && mode === "scene") showWelcomeScene();
   if (focus) get("hero-title").focus({ preventScroll: true });
 }
@@ -392,7 +393,11 @@ function setInspection(active: boolean) {
 }
 
 function takeMemory(memory: Memory, trigger: HTMLElement) {
-  if (opened || inspectionTrigger || view === "welcome") return;
+  if (opened || inspectionTrigger || view === "welcome" || (memory === tribute && view !== 4)) return;
+  if (memory === tribute) {
+    window.clearTimeout(letterArrivalTimer);
+    letterArrival.hidden = true;
+  }
   if (!scene) {
     opened = true;
     content.show(memory, trigger);
@@ -513,7 +518,7 @@ async function loadRoom() {
   mode = "loading";
   renderStage();
   loadingTimer = window.setTimeout(
-    () => useReading("Tải phòng quá lâu. Bạn có thể tiếp tục ở chế độ đọc."),
+    () => useReading("Tải phòng quá lâu. Bạn vẫn có thể xem các kỷ niệm."),
     10000,
   );
   try {
@@ -559,6 +564,4 @@ async function loadRoom() {
   }
 }
 renderIntro();
-if (new URLSearchParams(location.search).get("che-do") === "doc") {
-  useReading("Chọn một chương để xem ảnh và đọc kỷ niệm mà không cần 3D.");
-} else void loadRoom();
+void loadRoom();

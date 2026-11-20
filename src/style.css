@@ -188,6 +188,19 @@ h1, h2, h3, h4, p { margin: 0; }
 .transition-rule { width: 80px; height: 1px; background: #f3dfb8; opacity: .75; }
 .transition-footnote { font: italic 15px var(--serif); }
 [data-transitioning] .stage { transform: scale(1.025); transition: transform 2400ms ease-in-out; }
+.letter-arrival {
+  position: absolute; top: max(84px, calc(env(safe-area-inset-top) + 72px)); left: 50%; z-index: 6;
+  display: flex; align-items: center; gap: 10px; width: max-content; max-width: calc(100% - 36px);
+  padding: 10px 16px; border: 1px solid #f1cd8e8c; border-radius: 9px;
+  color: #fff4d4; background: #263d30ed; box-shadow: 0 8px 25px #19281f70;
+  font: 500 13px var(--serif); pointer-events: none;
+  animation: letter-arrival 620ms cubic-bezier(.2,.8,.3,1) both;
+}
+.letter-arrival svg { flex: none; color: #f1cd8e; }
+@keyframes letter-arrival {
+  from { opacity: 0; transform: translate(-50%, 15px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
 
 .reader {
   width: min(640px, calc(100% - 30px)); max-height: min(85dvh, 760px); padding: 0; margin: auto;
