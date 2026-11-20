@@ -169,6 +169,9 @@ export class SceneManager {
       root.scale.setScalar(state.scale)
       if (state.glow) (state.glow.material as T.MeshBasicMaterial).opacity = 0
     }
+    // Inspection owns the object's transform while it is lifted. A stale hover
+    // state must not write the docked position/scale over the held object.
+    this.hoverStates.clear()
   }
   private updateHover(time: number) {
     const dt = Math.min(50, time - (this.lastFrame || time))

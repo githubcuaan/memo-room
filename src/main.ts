@@ -340,7 +340,7 @@ function takeMemory(memory: Memory, trigger: HTMLElement) {
   setInspection(true)
   const envelope = memory === tribute
   inspection.setAttribute('aria-label', envelope ? 'Phong bì tri ân' : `Xem ${memory.title}`)
-  unseal.innerHTML = `${icon(envelope ? 'mail' : memory.kind === 'photo' ? 'image' : 'book', 17)} ${envelope ? 'Mở phong bì' : memory.kind === 'photo' ? 'Xem ảnh và câu chuyện' : 'Đọc lời nhắn'}`
+  unseal.innerHTML = `${icon(envelope ? 'mail' : 'book', 17)} ${envelope ? 'Mở phong bì' : 'Đọc lời nhắn'}`
   get('inspect-detail').textContent = envelope ? 'Đang nhấc phong bì lên…' : 'Đang nhấc kỷ niệm lên…'
   unseal.disabled = true
   putBack.focus({ preventScroll: true })

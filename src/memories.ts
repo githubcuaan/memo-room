@@ -7,6 +7,7 @@ export type Memory = {
   kind: 'photo' | 'note' | 'pending'
   title: string
   label?: string
+  noteTitle?: string
   recipient?: string
   previewText?: string
   body?: string[]
@@ -49,8 +50,35 @@ export const memories: Memory[] = [
       'Em chúc Cô Hạnh sức khoẻ, công tác tốt. Em mong cô sẽ tiếp tục đưa những que củi cho lứa học sinh tiếp theo để giữ được những ngọn lửa đó',
     ],
   },
-  { id: 'y2-photo-a', year: 2, slot: 0, kind: 'photo', title: 'Ảnh thầy Hưng' },
-  { id: 'y2-photo-b', year: 2, slot: 1, kind: 'photo', title: 'Ảnh cô Vân' },
+  {
+    id: 'y2-photo-a', year: 2, slot: 0, kind: 'photo', title: 'Ổ quỷ 20/11', label: 'Ảnh thầy Hưng',
+    noteTitle: 'Problem solver', recipient: 'Nguyễn Quốc Hưng',
+    body: [
+      'Đầu năm 2 chưa kịp vui mừng thì kiếp nạn tiếp theo đã tới, Em bị mất học bổng khuyến khích học tập do nộp học phí muộn. Người ở bên hỗ trợ cũng như động viên, mặc dù đã cố gắng hết sức nhưng vẫn không thể cứu chữa.',
+      'Cho đến hiện tại, thầy vẫn luôn ở bên và cố gắng giải quyết mọi vấn đề cho học sinh, siêu tâm huyết với nghề.',
+      '+1 Respect cho sếp Hưng !',
+      'Chúc thầy sức khoẻ dồi dào để tiếp tục giúp đỡ, carry lũ quỷ công nghệ thông tin. Em xin cảm ơn thầy !',
+    ],
+    photo: {
+      src: `${import.meta.env.BASE_URL}anh/thay-hung.webp`,
+      thumbnail: `${import.meta.env.BASE_URL}anh/thay-hung-nho.webp`,
+      alt: 'Thầy Hưng chụp cùng các bạn sinh viên.',
+    },
+  },
+  {
+    id: 'y2-photo-b', year: 2, slot: 1, kind: 'photo', title: 'Tập thể OOP', label: 'Ảnh cô Vân',
+    noteTitle: 'Hope Maker', recipient: 'Nguyễn Thị Vân',
+    body: [
+      'Một trong những cột mốc quan trọng của em là OOP, nó là nền tảng quan trọng với nhiều môn học sau này của em. Cô Vân đã cook môn này siêu ngon với phong cách và cá tính riêng của cô.',
+      '1 Fact rất thú vị là cô từng trao niềm tin cho mình lên đứng lớp để dạy thay cô 1 tiết, dù buổi đó có hơi run nhưng em vẫn đã cố gắng hoàn thành. Hơi tiếc chút, giờ mà cho em lên lại khéo nói nhem nhẻm hâha.',
+      'Chúc cô Vân giữ vững được phong cách, cá tính riêng của mình và tiếp tục truyền dạy kiến thức bổ ích cho các lứa tiếp nối !',
+    ],
+    photo: {
+      src: `${import.meta.env.BASE_URL}anh/co-van.webp`,
+      thumbnail: `${import.meta.env.BASE_URL}anh/co-van-nho.webp`,
+      alt: 'Cô Vân chụp cùng lớp trong phòng học.',
+    },
+  },
   { id: 'y3-note-a', year: 3, slot: 0, kind: 'note', title: 'Note Kim Thành' },
   { id: 'y3-note-b', year: 3, slot: 1, kind: 'note', title: 'Note Trịnh Thành' },
   { id: 'y4-photo', year: 4, slot: 0, kind: 'photo', title: 'Ảnh Kim Tuấn' },
